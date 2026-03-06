@@ -1,0 +1,20 @@
+{
+  "name": "ask-opinion-marketplace",
+  "owner": {
+    "name": "Iustin Sibiescu"
+  },
+  "metadata": {
+    "description": "AI-to-AI debate tools for Claude Code — get adversarial review from other AIs"
+  },
+  "plugins": [
+    {
+      "name": "ask-opinion",
+      "source": "./plugins/ask-opinion",
+      "description": "Debate your plan with another AI (Codex/GPT) through structured adversarial review",
+      "version": "1.0.0",
+      "keywords": ["debate", "review", "codex", "gpt", "second-opinion", "planning"],
+      "category": "productivity",
+      "license": "MIT"
+    }
+  ]
+}
