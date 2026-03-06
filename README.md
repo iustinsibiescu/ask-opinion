@@ -21,7 +21,7 @@ A Claude Code plugin that lets Claude debate its plan with another AI (Codex/GPT
 ### From the plugin marketplace
 
 ```
-/plugin marketplace add your-username/ask-opinion
+/plugin marketplace add iustinsibiescu/ask-opinion
 /plugin install ask-opinion@ask-opinion-marketplace
 ```
 
@@ -30,7 +30,7 @@ A Claude Code plugin that lets Claude debate its plan with another AI (Codex/GPT
 Clone this repo and symlink the command into your global commands:
 
 ```bash
-git clone https://github.com/your-username/ask-opinion.git
+git clone https://github.com/iustinsibiescu/ask-opinion.git
 ln -sf "$(pwd)/ask-opinion/plugins/ask-opinion/commands/ask-opinion.md" ~/.claude/commands/ask-opinion.md
 ```
 
