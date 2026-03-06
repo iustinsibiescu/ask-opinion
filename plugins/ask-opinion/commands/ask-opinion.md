@@ -1,12 +1,18 @@
 ---
 description: Debate your current plan with another AI to refine it through adversarial review
-argument-hint: codex
+argument-hint: codex|gemini
 allowed-tools: Bash, Read, Glob, Grep, WebSearch, WebFetch, Edit
 ---
 
 # AI-to-AI Debate Protocol
 
 You are about to engage in a structured debate with another AI ($ARGUMENTS) to stress-test and refine the current plan. Follow this protocol exactly.
+
+## Argument Validation
+
+Before starting, validate the `$ARGUMENTS` value:
+- If `$ARGUMENTS` is `codex` or `gemini`, proceed.
+- Otherwise, print: `Unsupported provider: $ARGUMENTS. Supported options: codex, gemini` and stop.
 
 ## Phase 1: Prepare the Debate
 
@@ -59,6 +65,7 @@ For each concern use this format:
 
 Or if no concerns: AGREED: <summary>"
 
+## If using Codex ($ARGUMENTS is "codex"):
 codex exec \
   --sandbox read-only \
   --skip-git-repo-check \
@@ -66,13 +73,20 @@ codex exec \
   -o /tmp/debate-round-1.txt \
   -C "$(pwd)" \
   "$DEBATE_PROMPT"
+
+## If using Gemini ($ARGUMENTS is "gemini"):
+cd "$(pwd)" && gemini \
+  -p "$DEBATE_PROMPT" \
+  --sandbox --approval-mode plan \
+  -o text > /tmp/debate-round-1.txt 2>&1
 ```
 
 **IMPORTANT construction notes:**
-- Use a shell variable (`DEBATE_PROMPT`) to hold the prompt, then pass `"$DEBATE_PROMPT"` to codex exec.
+- Use a shell variable (`DEBATE_PROMPT`) to hold the prompt, then pass `"$DEBATE_PROMPT"` to the CLI.
 - Escape any double quotes, dollar signs, and backticks in the plan content when inserting it into the variable assignment. Use single quotes for the variable assignment if possible, or properly escape special characters.
 - Make sure the entire command is a single Bash tool call.
-- Set the Bash tool timeout to 200000 (200 seconds) to allow for codex processing time.
+- Set the Bash tool timeout to 200000 (200 seconds) to allow for processing time.
+- **Codex** uses `-o <file>` for file output; **Gemini** uses `-o text` for output format and stdout redirect (`>`) for file output.
 
 ## Phase 3: Evaluate the Response
 
@@ -135,6 +149,7 @@ For each previous concern:
 **Reasoning**: ...
 **Refined suggestion**: (if unresolved)"
 
+## If using Codex ($ARGUMENTS is "codex"):
 codex exec \
   --sandbox read-only \
   --skip-git-repo-check \
@@ -142,6 +157,12 @@ codex exec \
   -o /tmp/debate-round-N.txt \
   -C "$(pwd)" \
   "$DEBATE_PROMPT"
+
+## If using Gemini ($ARGUMENTS is "gemini"):
+cd "$(pwd)" && gemini \
+  -p "$DEBATE_PROMPT" \
+  --sandbox --approval-mode plan \
+  -o text > /tmp/debate-round-N.txt 2>&1
 ```
 
 Then go back to Phase 3 to evaluate the new response.
@@ -158,7 +179,7 @@ Stop the debate when ANY of these occur:
 
 1. **Agreement**: The response contains `AGREED:` at the start of a line.
 2. **Stale debate**: The other AI repeats substantially the same argument for 4-5 consecutive rounds without introducing new evidence or reasoning. In this case, keep your position, terminate, and explain to the user why you're ending the debate (the argument has stalled).
-3. **Timeout/Error**: codex exec fails or times out (exit code non-zero, empty output). Report the error and proceed with the current plan.
+3. **Timeout/Error**: The CLI command fails or times out (exit code non-zero, empty output). Report the error and proceed with the current plan.
 4. **User interruption**: The user manually stops.
 
 There is **no fixed round limit**. The debate runs until convergence or stale detection.
@@ -188,9 +209,9 @@ If there are accepted changes that haven't been applied to the plan file yet, ap
 
 | Scenario | Action |
 |----------|--------|
-| codex exec times out | Print "Codex timed out. Proceeding with current plan." and go to Phase 6 with what you have. |
-| codex exec returns non-zero exit code | Print the error message and suggest the user retry with `/ask-opinion $ARGUMENTS`. |
-| Output file is empty | Print "Codex returned empty response. This may be a transient issue. Suggest retrying." and stop. |
+| CLI command times out | Print "$ARGUMENTS timed out. Proceeding with current plan." and go to Phase 6 with what you have. |
+| CLI command returns non-zero exit code | Print the error message and suggest the user retry with `/ask-opinion $ARGUMENTS`. |
+| Output file is empty | Print "$ARGUMENTS returned empty response. This may be a transient issue. Suggest retrying." and stop. |
 | Stale debate (4-5 rounds same argument) | Print "Debate has stalled — same argument repeated N times with no new evidence. Keeping current position." and go to Phase 6. |
 | No plan found | Print instructions to create a plan first. Stop. |
 
@@ -199,5 +220,6 @@ If there are accepted changes that haven't been applied to the plan file yet, ap
 - You are the primary architect. The other AI is a reviewer. You make the final call on what to accept or reject, but you must be intellectually honest — if a critique is valid, accept it.
 - Always show your reasoning to the user. Transparency is key.
 - Never let the other AI modify files. All file modifications are done by you (Claude) via the Edit tool.
-- The `--sandbox read-only` flag on codex exec ensures the other AI cannot write to the filesystem.
+- **Codex**: The `--sandbox read-only` flag provides process-level read-only isolation (guaranteed).
+- **Gemini**: The `--sandbox --approval-mode plan` flags provide Docker-based sandboxing and read-only mode. Note: Gemini's isolation is best-effort and platform-dependent (requires Docker). It is not strictly equivalent to Codex's guaranteed read-only sandbox.
 - Keep the user informed at each phase with clear headers and status updates.

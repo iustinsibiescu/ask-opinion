@@ -10,9 +10,9 @@
     {
       "name": "ask-opinion",
       "source": "./plugins/ask-opinion",
-      "description": "Debate your plan with another AI (Codex/GPT) through structured adversarial review",
+      "description": "Debate your plan with another AI (Codex/GPT or Gemini) through structured adversarial review",
       "version": "1.0.0",
-      "keywords": ["debate", "review", "codex", "gpt", "second-opinion", "planning"],
+      "keywords": ["debate", "review", "codex", "gpt", "gemini", "second-opinion", "planning"],
       "category": "productivity",
       "license": "MIT"
     }

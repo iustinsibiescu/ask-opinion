@@ -1,6 +1,6 @@
 # ask-opinion
 
-A Claude Code plugin that lets Claude debate its plan with another AI (Codex/GPT) through structured adversarial review. No human involvement needed — the AIs argue back and forth until they converge on a refined plan.
+A Claude Code plugin that lets Claude debate its plan with another AI (Codex/GPT or Gemini) through structured adversarial review. No human involvement needed — the AIs argue back and forth until they converge on a refined plan.
 
 ## How it works
 
@@ -14,7 +14,8 @@ A Claude Code plugin that lets Claude debate its plan with another AI (Codex/GPT
 ## Prerequisites
 
 - [Claude Code](https://claude.ai/code) installed
-- [Codex CLI](https://github.com/openai/codex) with a working subscription (`codex exec` must work)
+- [Codex CLI](https://github.com/openai/codex) with a working subscription (`codex exec` must work) — for `/ask-opinion codex`
+- [Gemini CLI](https://github.com/google-gemini/gemini-cli) (`npm install -g @google/gemini-cli`) — for `/ask-opinion gemini`
 
 ## Install
 
@@ -40,7 +41,8 @@ In Claude Code:
 
 ```
 # Enter plan mode and create a plan, then:
-/ask-opinion codex
+/ask-opinion codex    # debate with Codex/GPT
+/ask-opinion gemini   # debate with Gemini
 ```
 
 The debate runs autonomously. You'll see:
@@ -75,7 +77,8 @@ Test locally before publishing:
 Run the integration test to verify Codex connectivity:
 
 ```bash
-bash tests/test-codex.sh
+bash tests/test-codex.sh     # test Codex integration
+bash tests/test-gemini.sh    # test Gemini integration
 ```
 
 ## Project structure
@@ -91,14 +94,15 @@ ask-opinion/
 │       └── commands/
 │           └── ask-opinion.md # The command (all the logic)
 ├── tests/
-│   └── test-codex.sh         # Integration test
+│   ├── test-codex.sh         # Codex integration test
+│   └── test-gemini.sh        # Gemini integration test
 ├── LICENSE
 └── README.md
 ```
 
 ## Roadmap
 
-- [ ] Gemini CLI support (`/ask-opinion gemini`)
+- [x] Gemini CLI support (`/ask-opinion gemini`)
 - [ ] Debate transcript persistence (save full history)
 - [ ] Third AI as tiebreaker/judge
 - [ ] Auto-trigger hook (debate before plan finalization)

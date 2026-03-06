@@ -1,6 +1,6 @@
 {
   "name": "ask-opinion",
-  "description": "AI-to-AI debate system — get a second opinion from another AI (Codex/GPT) on your plan through structured adversarial review",
+  "description": "AI-to-AI debate system — get a second opinion from another AI (Codex/GPT or Gemini) on your plan through structured adversarial review",
   "version": "1.0.0",
   "commands": ["./commands/"]
 }
